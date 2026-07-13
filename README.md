@@ -15,8 +15,6 @@ Exemples de commandes :
 
 The `Conjugueur` plugin is fully multi-room.
 
-The `Salutation` plugin relies solely on the system's available languages.
-
  <table style="border: none;">
   <tr>
     <td style="border: none;"><img src="Conjugueur/assets/images/Conjugueur.png" alt="Conjugueur Logo" width="120"></td>
