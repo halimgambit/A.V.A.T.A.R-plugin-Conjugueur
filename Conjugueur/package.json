@@ -1,0 +1,12 @@
+{
+    "name": "Conjugueur",
+    "version": "1.0.0",
+    "type": "module",
+    "description": "Plugin Conjugueur for A.V.A.T.A.R",
+    "repository": "https://github.com/YOUR-REPOSITORY",
+    "keywords": [
+        "Conjugueur"
+    ],
+    "author": "YOUR-NAME",
+    "license": "mit"
+  }
