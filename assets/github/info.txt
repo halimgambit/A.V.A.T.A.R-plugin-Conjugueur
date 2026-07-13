@@ -1,0 +1,2 @@
+Conjugueur
+permet de conjuguer un verbe français à la demande. Le plugin reconnaît le verbe et le temps demandés dans une phrase naturelle, récupère la conjugaison depuis Le Conjugueur et la lit à voix haute. Il prend actuellement en charge le présent, l'imparfait, le passé simple, le passé composé et le futur simple.
