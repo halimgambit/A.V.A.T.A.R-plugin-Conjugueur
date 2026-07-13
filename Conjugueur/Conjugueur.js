@@ -18,9 +18,7 @@ export async function action(data, callback) {
 }
 
 const conjugate = async (data, client) => {
-
     const sentence = data.rawSentence || data.action?.sentence || "";
-
     if (!sentence) {
         return Avatar.speak("Je n'ai pas compris le verbe à conjuguer.", client,
             () => Avatar.Speech.end(client)
@@ -30,26 +28,11 @@ const conjugate = async (data, client) => {
     const rawSentence = sentence.toLowerCase().trim();
 
     const tempsDisponibles = [
-        {
-            nom: "Passé composé",
-            mots: ["passé composé", "passe compose", "au passé composé", "au passe compose"]
-        },
-        {
-            nom: "Passé simple",
-            mots: ["passé simple", "passe simple", "au passé simple", "au passe simple"]
-        },
-        {
-            nom: "Futur simple",
-            mots: ["futur simple", "au futur", "futur"]
-        },
-        {
-            nom: "Imparfait",
-            mots: ["imparfait", "à l'imparfait", "a l imparfait"]
-        },
-        {
-            nom: "Présent",
-            mots: ["présent", "present", "au présent", "au present"]
-        }
+        {nom: "Passé composé", mots: ["passé composé", "passe compose", "au passé composé", "au passe compose"]},
+        {nom: "Passé simple", mots: ["passé simple", "passe simple", "au passé simple", "au passe simple"]},
+        {nom: "Futur simple", mots: ["futur simple", "au futur", "futur"]},
+        {nom: "Imparfait", mots: ["imparfait", "à l'imparfait", "a l imparfait"]},
+        {nom: "Présent", mots: ["présent", "present", "au présent", "au present"]}
     ];
 
     let tempsCible = "Présent";
@@ -71,7 +54,7 @@ const conjugate = async (data, client) => {
     let verbe = rawSentence;
 
     for (const mot of motsASupprimer) {
-        const reg = new RegExp(`\\b${mot}\\b`, "gi");
+        const reg = new RegExp(`(?<=^|\\s)${mot}(?=\\s|$)`, "gi");
         verbe = verbe.replace(reg, " ");
     }
 
@@ -84,41 +67,30 @@ const conjugate = async (data, client) => {
     }
 
     try {
-
         info(`Conjugaison : ${verbe} (${tempsCible})`);
 
         const response = await fetch(`https://leconjugueur.lefigaro.fr/conjugaison/verbe/${encodeURIComponent(verbe)}.html`, {
-                headers: {
-                    "User-Agent": "Mozilla/5.0"
-                }
+            headers: {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
             }
-        );
+        });
 
         if (!response.ok)
             throw new Error(`Erreur HTTP ${response.status}`);
 
         const html = await response.text();
-
         const $ = cheerio.load(html);
-
         let lignes = [];
 
         $(".tempsBloc").each((i, el) => {
-
             const titre = $(el).text().trim();
-
             if (titre.toLowerCase() === tempsCible.toLowerCase()) {
-
-                const bloc = $(el).parent().html();
-
-                let texte = bloc
-                    .replace(/<div[^>]*class="tempsBloc"[^>]*>[\s\S]*?<\/div>/i, "")
-                    .replace(/<br\s*\/?>/gi, "\n")
-                    .replace(/<[^>]+>/g, "")
-                    .replace(/&nbsp;/g, " ")
-                    .trim();
-
-                lignes = texte.split("\n").map(l => l.trim()).filter(Boolean);
+                const $parentClone = $(el).parent().clone();
+                $parentClone.find(".tempsBloc").remove();
+                $parentClone.find("br").replaceWith("\n");
+                const texteNettoye = $parentClone.text().trim();
+                
+                lignes = texteNettoye.split("\n").map(l => l.trim()).filter(Boolean);
                 return false;
             }
         });
@@ -127,6 +99,8 @@ const conjugate = async (data, client) => {
             throw new Error(`Temps "${tempsCible}" introuvable.`);
 
         const reponse = `Le verbe ${verbe} au ${tempsCible.toLowerCase()} : ${lignes.join(", ")}.`;
+
+        info(reponse);
 
         Avatar.speak(reponse, client, () => {
             Avatar.Speech.end(client);
