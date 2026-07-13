@@ -1,6 +1,8 @@
 # Conjugueur
 Conjugue les verbes français au plusieurs temps, avec une commande vocale.
 
+Conjugue au présent, à l'imparfait, au passé simple, au passé composé et au futur simple,
+
 - This plugin is an add-on for the [A.V.A.T.A.R](https://avatar-home-automation.github.io/docs) framework. 
 
  ## 🎯 Usage
